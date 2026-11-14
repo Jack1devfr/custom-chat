@@ -3,7 +3,7 @@ on:
   push:
     tags: ["v*"]
 permissions:
-  contents: read
+  contents: write
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -11,11 +11,12 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate manifest
         run: node -e "const m=require('./manifest.json'); if(m.manifest_version!==3 || !/^\\d+\\.\\d+\\.\\d+$/.test(m.version)) process.exit(1)"
-      - name: Build ZIP
+      - name: Build release ZIP
         run: |
           mkdir -p dist
           zip -r "dist/chat-custom-${GITHUB_REF_NAME}.zip" manifest.json content.js popup.html popup.js popup.css rules.json logo.svg README.md
-      - uses: actions/upload-artifact@v4
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          name: chat-custom-${{ github.ref_name }}
-          path: dist/*.zip
+          generate_release_notes: true
+          files: dist/*.zip
