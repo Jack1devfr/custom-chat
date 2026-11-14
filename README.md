@@ -8,23 +8,31 @@ Manifest V3 Chrome extension for https://www.polybuzz.ai/.
 - Custom image or solid-color backgrounds.
 - Background opacity, image fit, and position controls.
 - Preferences stored in chrome.storage.local.
-- Chat Custom logo and extension icons.
+- Chat Custom logo.
 
 ## Install locally
-1. Download and extract the release ZIP.
-2. Open chrome://extensions.
-3. Enable Developer mode.
-4. Select Load unpacked and choose this folder.
+1. Download and extract a release ZIP.
+2. Open chrome://extensions and enable Developer mode.
+3. Choose Load unpacked and select the extracted extension folder.
 
-## Updates
-For automatic Chrome updates, publish the extension through the Chrome Web Store (Unlisted is an option) and publish subsequent versions to the same listing. Chrome handles update delivery. GitHub Actions can package tagged releases and publish to the Web Store using credentials stored only in GitHub Actions Secrets.
+## Update without the Chrome Web Store
+This project supports a user-run PowerShell updater for unpacked installations:
+1. Download update-chat-custom.ps1 from the repository.
+2. Run it in PowerShell.
+3. Paste the full folder path selected with Load unpacked (the folder containing manifest.json).
+4. The updater downloads the latest public GitHub Release ZIP, checks the extension name and Manifest V3, backs up the installed folder, and copies the new files.
+5. Open chrome://extensions and click Reload on Chat Custom.
 
-Unpacked developer installs do not auto-update from GitHub; pull the latest code and reload the extension manually.
+The updater does not silently install or execute remote code. Chrome still requires the user to reload an unpacked extension. Preferences stored in chrome.storage.local remain in Chrome's extension storage when the same unpacked extension identity/folder is retained. Avoid removing and re-adding the extension.
+
+## Publishing a release
+Update manifest.json to a new version, commit the changes, then create and push a matching tag (for example, version 1.1.1 uses tag v1.1.1). GitHub Actions packages the extension and attaches the ZIP to a GitHub Release. The updater reads the latest published release.
 
 ## Security
-- Do not fetch or execute JavaScript from GitHub at runtime. Manifest V3 requires executable extension code to ship inside the package.
-- Protect release tags and restrict publishing workflows to trusted maintainers.
-- Never commit Web Store refresh tokens, client secrets, or API credentials.
+- The updater only downloads a ZIP from this repository's GitHub Releases.
+- It validates the package manifest before copying files and creates a timestamped backup.
+- It does not execute JavaScript from GitHub as an updater process.
+- Do not commit passwords, access tokens, or publishing secrets.
 
 ## Source
 https://github.com/Jack1devfr/custom-chat
