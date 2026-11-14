@@ -1,0 +1,21 @@
+name: Package Chat Custom
+on:
+  push:
+    tags: ["v*"]
+permissions:
+  contents: read
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate manifest
+        run: node -e "const m=require('./manifest.json'); if(m.manifest_version!==3 || !/^\\d+\\.\\d+\\.\\d+$/.test(m.version)) process.exit(1)"
+      - name: Build ZIP
+        run: |
+          mkdir -p dist
+          zip -r "dist/chat-custom-${GITHUB_REF_NAME}.zip" manifest.json content.js popup.html popup.js popup.css rules.json logo.svg README.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chat-custom-${{ github.ref_name }}
+          path: dist/*.zip
